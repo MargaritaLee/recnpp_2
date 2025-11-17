@@ -801,4 +801,12 @@ body {
     .certificate-card {
         padding: 1rem;
     }
+
+}
+/* Гарантируем белый цвет телефонов в футере на мобильных */
+@media (max-width: 768px) {
+    .footer .contact-item p,
+    .footer .contact-item strong {
+        color: #ffffff !important;
+    }
 }
