@@ -73,6 +73,11 @@ body {
     display: none;
     font-size: 1.5rem;
     cursor: pointer;
+    background: none;
+    border: none;
+    color: #333;
+    padding: 5px;
+    z-index: 1001;
 }
 
 /* Contacts Page Specific Styles */
@@ -239,11 +244,6 @@ body {
 
 /* Убираем флаг Украины из Leaflet */
 .leaflet-control-attribution {
-    display: none !important;
-}
-
-/* Или более точечно - только флаг */
-.leaflet-control-attribution a[href*="leaflet"] {
     display: none !important;
 }
 
@@ -511,6 +511,8 @@ body {
         padding-top: 2rem;
         transition: left 0.3s ease;
         gap: 0;
+        z-index: 1000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
     .nav-menu.active {
@@ -526,6 +528,12 @@ body {
         display: block;
         padding: 1rem;
         border-bottom: 1px solid #eee;
+        font-size: 1.1rem;
+        width: 100%;
+    }
+    
+    .nav-menu a:hover {
+        background: #f8f9fa;
     }
     
     .contacts-hero {
