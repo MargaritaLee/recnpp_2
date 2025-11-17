@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Изготовление деталей - РемЭнергоКомплект НПП</title>
+    <link rel="stylesheet" href="style-manufacturing.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="./logo/logo_new.png" alt="РемЭнергоКомплект НПП" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">Об организации</a></li>
+                <li><a href="turbogenerators.html">Турбогенераторы</a></li>
+                <li><a href="hydrogenerators.html">Гидрогенераторы</a></li>
+                <li><a href="suppliers.html">Поставщикам</a></li>
+                <li><a href="vacancies.html">Вакансии</a></li>
+                <li><a href="manufacturing.html" class="active">Изготовление деталей</a></li>
+                <li><a href="contacts.html">Контакты</a></li>
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content manufacturing-page">
+        <!-- Hero Section -->
+        <section class="manufacturing-hero">
+            <div class="container">
+                <h1>Изготовление деталей</h1>
+                <p>Профессиональное производство сложных узлов и компонентов для энергетического оборудования</p>
+            </div>
+        </section>
+
+        <!-- Manufacturing Info -->
+        <section class="manufacturing-info-section">
+            <div class="container">
+                <h2 class="section-title">Наши возможности</h2>
+                <div class="capabilities-grid">
+                    <div class="capability-card">
+                        
+                        <h3>Сложные детали</h3>
+                        <p>Изготовление элементов со сложной геометрией и прецизионными допусками</p>
+                    </div>
+                    <div class="capability-card">
+                       
+                        <h3>Эксклюзивные решения</h3>
+                        <p>Производство уникальных компонентов, недоступных у других производителей</p>
+                    </div>
+                    <div class="capability-card">
+                      
+                        <h3>Индивидуальное проектирование</h3>
+                        <p>Разработка деталей по техническим заданиям заказчика</p>
+                    </div>
+                    <div class="capability-card">
+                       
+                        <h3>Срочное изготовление</h3>
+                        <p>Оперативное производство для минимизации простоев оборудования</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Form Section -->
+        <section class="order-form-section">
+            <div class="container">
+                <h2 class="section-title">Заявка на изготовление деталей</h2>
+                <div class="form-container">
+                    <div id="form-status" class="form-status"></div>
+                    <form class="manufacturing-form" id="manufacturingForm" enctype="multipart/form-data">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="company">Название организации *</label>
+                                <input type="text" id="company" name="company" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contact-person">Контактное лицо *</label>
+                                <input type="text" id="contact-person" name="contact-person" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="phone">Телефон *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="equipment-type">Тип оборудования</label>
+                            <select id="equipment-type" name="equipment-type">
+                                <option value="">Выберите тип оборудования</option>
+                                <option value="turbogenerator">Турбогенератор</option>
+                                <option value="hydrogenerator">Гидрогенератор</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="part-name">Наименование детали *</label>
+                            <input type="text" id="part-name" name="part-name" required placeholder="Например: Подбандажный сегмент">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="part-description">Описание детали и технические требования *</label>
+                            <textarea id="part-description" name="part-description" rows="4" required placeholder="Опишите деталь, укажите материал, размеры, особенности..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="quantity">Количество (шт.)</label>
+                            <input type="number" id="quantity" name="quantity" min="1" value="1">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="deadline">Желаемый срок изготовления</label>
+                            <input type="date" id="deadline" name="deadline">
+                        </div>
+
+                        <div class="form-group file-upload-group">
+                            <label for="drawing-file">Прикрепить чертеж или техническую документацию</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="drawing-file" name="drawing-file" accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png,.doc,.docx">
+                                <label for="drawing-file" class="file-upload-label">
+                                    <span class="file-upload-text">Выберите файл</span>
+                                    <span class="file-upload-button">Обзор</span>
+                                </label>
+                            </div>
+                            <div class="file-info" id="file-info">Файл не выбран</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="additional-info">Дополнительная информация</label>
+                            <textarea id="additional-info" name="additional-info" rows="3" placeholder="Дополнительные пожелания или комментарии..."></textarea>
+                        </div>
+
+                        <div class="form-submit">
+                            <button type="submit" class="submit-btn" id="submit-btn">
+                                <span class="btn-text">Отправить заявку</span>
+                                <span class="btn-loading" style="display: none;">Отправка...</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Info -->
+        <section class="additional-info-section">
+            <div class="container">
+                <h2 class="section-title">Дополнительная информация</h2>
+                <div class="info-content">
+                    <div class="info-block">
+                        <h3>Процесс работы</h3>
+                        <ul>
+                            <li>Рассмотрение заявки в течение 1 рабочего дня</li>
+                            <li>Технический анализ и расчет стоимости</li>
+                            <li>Согласование сроков и условий</li>
+                            <li>Изготовление и контроль качества</li>
+                            <li>Доставка и сопровождение</li>
+                        </ul>
+                    </div>
+                    <div class="info-block">
+                        <h3>Поддерживаемые форматы файлов</h3>
+                        <ul>
+                            <li>Чертежи: PDF, DWG, DXF</li>
+                            <li>Изображения: JPG, JPEG, PNG</li>
+                            <li>Документы: DOC, DOCX</li>
+                            <li>Максимальный размер: 10 МБ</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo-section">
+                <a href="index.html">
+                    <img src="./logo/logo_new.png" alt="РемЭнергоКомплект НПП" class="footer-logo">
+                </a>
+                <div class="footer-logo-text">
+                    <div class="logo-text-large">РЕМЭНЕРГОКОМПЛЕКТ НПП</div>
+                    <p>Изготовление узлов и деталей для Турбогенераторов и Гидрогенераторов производства РФ</p>
+                </div>
+            </div>
+            <div class="footer-content">
+                <div class="footer-contacts">
+                    <div class="contact-item">
+                        <strong>Телефоны:</strong>
+                        <p>+7 (911) 753-97-41</p>
+                        <p>+7 (911) 179-79-85</p>
+                        <p>+7 (953) 161-84-69</p>
+                        <p>+7 (911) 237-70-92</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Email:</strong>
+                        <p>recnpp-s@yandex.ru</p>
+                        <p>rl.recnpp-s@yandex.ru</p>
+                        <p>ep.recnpp-s@yandex.ru</p>
+                        <p>kn.recnpp-s@yandex.ru</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Адреса:</strong>
+                        <p>195009, г. Санкт-Петербург, пр-кт Кондратьевский, д.3, к.4, Лит.Д, помещ.2Н-2</p>
+                        <p>192007, г. Санкт-Петербург, набережная реки Волковки, 17</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 РемЭнергоКомплект НПП. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script-manufacturing.js"></script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - РемЭнергоКомплект НПП</title>
+    <link rel="stylesheet" href="style-contacts.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">
+                <a href="index.html">
+                <img src="C:\Users\rital\Desktop\Новая версия сайта\logo\logo_new.png" 
+                     alt="РемЭнергоКомплект НПП" class="logo-img">
+                 </a>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="about.html">Об организации</a></li>
+                <li><a href="turbogenerators.html">Турбогенераторы</a></li>
+                <li><a href="hydrogenerators.html">Гидрогенераторы</a></li>
+                <li><a href="suppliers.html">Поставщикам</a></li>
+                <li><a href="vacancies.html">Вакансии</a></li>
+                <li><a href="manufacturing.html">Изготовление деталей</a></li>
+                <li><a href="contacts.html" class="active">Контакты</a></li>
+            </ul>
+            <div class="menu-toggle">☰</div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content contacts-page">
+        <!-- Hero Section -->
+        <section class="contacts-hero">
+            <div class="container">
+                <h1>Контакты</h1>
+                <p>Свяжитесь с нами удобным для вас способом</p>
+            </div>
+        </section>
+
+        <!-- Contact Information -->
+        <section class="contact-info-section">
+            <div class="container">
+                <h2 class="section-title">Контактная информация</h2>
+                
+                <div class="contact-grid">
+                    <!-- Адреса -->
+                    <div class="contact-card">
+                        
+                        <h3>Наши адреса</h3>
+                        <div class="addresses">
+                            <div class="address-item">
+                                <h4>Основной офис</h4>
+                                <p>195009, г. Санкт-Петербург, пр-кт Кондратьевский, д.3, к.4, Лит.Д, помещ.2Н-2</p>
+                            </div>
+                            <div class="address-item">
+                                <h4>Производственный комплекс</h4>
+                                <p>192007, г. Санкт-Петербург, набережная реки Волковки, 17</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Телефоны -->
+                    <div class="contact-card">
+                        
+                        <h3>Телефоны</h3>
+                        <div class="contact-details">
+                            <p><strong>Отдел продаж:</strong> +7 (495) 123-45-67</p>
+                            <p><strong>Техническая поддержка:</strong> +7 (495) 765-43-21</p>
+                            <p><strong>Общие вопросы:</strong> +7 (495) 999-88-77</p>
+                        </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="contact-card">
+                        
+                        <h3>Электронная почта</h3>
+                        <div class="contact-details">
+                            <p><strong>Общие вопросы:</strong> info@remenergokomplekt.ru</p>
+                            <p><strong>Отдел продаж:</strong> sales@remenergokomplekt.ru</p>
+                            <p><strong>Техподдержка:</strong> support@remenergokomplekt.ru</p>
+                        </div>
+                    </div>
+
+                    <!-- Время работы -->
+                    <div class="contact-card">
+                        
+                        <h3>Режим работы</h3>
+                        <div class="contact-details">
+                            <p><strong>Понедельник - Пятница:</strong> 10:00 - 17:00</p>
+                            <p><strong>Суббота:</strong> выходной</p>
+                            <p><strong>Воскресенье:</strong> выходной</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Map Section -->
+        <section class="map-section">
+            <div class="container">
+                <h2 class="section-title">Как нас найти</h2>
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+                <div class="map-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #000066;"></span>
+                        <span>Основной офис - пр-кт Кондратьевский, д.3</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: #0066cc;"></span>
+                        <span>Производственный комплекс - наб. реки Волковки, 17</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form -->
+        <section class="contact-form-section">
+            <div class="container">
+                <h2 class="section-title">Обратная связь</h2>
+                <div class="form-container">
+                    <div id="form-status" class="form-status"></div>
+                    <form class="contact-form" id="contactForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="name">Ваше имя *</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Телефон *</label>
+                                <input type="tel" id="phone" name="phone" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Тема сообщения</label>
+                            <input type="text" id="subject" name="subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Сообщение *</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Отправить сообщение</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-logo-section">
+                <a href="index.html">
+                <img src="C:\Users\rital\Desktop\Новая версия сайта\logo\logo_new.png" 
+                     alt="РемЭнергоКомплект НПП" class="footer-logo">
+                 </a>
+                <div class="footer-logo-text">
+                    <div class="logo-text-large">РЕМЭНЕРГОКОМПЛЕКТ НПП</div>
+                    <p>Изготовление узлов и деталей для Турбогенераторов и Гидрогенераторов производства РФ</p>
+                </div>
+            </div>
+            <div class="footer-content">
+                <div class="footer-contacts">
+                    <div class="contact-item">
+                        <strong>Телефоны:</strong>
+                        <p>+7 (911) 753-97-41</p>
+                        <p>+7 (911) 179-79-85</p>
+                        <p>+7 (953) 161-84-69</p>
+                        <p>+7 (911) 237-70-92</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Email:</strong>
+                        <p>recnpp-s@yandex.ru</p>
+                        <p>rl.recnpp-s@yandex.ru</p>
+                        <p>ep.recnpp-s@yandex.ru</p>
+                        <p>kn.recnpp-s@yandex.ru</p>
+                    </div>
+                    <div class="contact-item">
+                        <strong>Адреса:</strong>
+                        <p>195009, г. Санкт-Петербург, пр-кт Кондратьевский, д.3, к.4, Лит.Д, помещ.2Н-2</p>
+                        <p>192007, г. Санкт-Петербург, набережная реки Волковки, 17</p>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 РемЭнергоКомплект НПП. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script-contacts.js"></script>
+</body>
+</html>
