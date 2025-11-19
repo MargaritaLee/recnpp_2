@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
     title: 'Контактное кольцо - Турбогенераторы',
     photos: [
         {
-            src: "cr_main.jpg",
+            src: "cr_1.jpg",
             caption: "Контактное кольцо турбогенератора 1 - прецизионное изготовление"
         },
         {
@@ -249,5 +249,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+
 
 
