@@ -50,12 +50,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }))
         },
         'contact-ring': {
-            title: 'Контактное кольцо - Турбогенераторы',
-            photos: Array.from({length: 18}, (_, i) => ({
-                src: "cr_main.jpeg" viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23fff8e8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%23f39c12'%3EКонтактное%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%23f39c12'%3EКольцо ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%23f39c12'%3E(Турбо)%3C/text%3E%3C/svg%3E`,
-                caption: `Контактное кольцо турбогенератора ${i + 1} - прецизионное`
-            }))
+    title: 'Контактное кольцо - Турбогенераторы',
+    photos: [
+        {
+            src: "cr_1.jpg",
+            caption: "Контактное кольцо турбогенератора 1 - прецизионное изготовление"
         },
+        {
+            src: "cr_2.jpg", 
+            caption: "Контактное кольцо турбогенератора 2 - вид сбоку"
+        },
+        {
+            src: "cr_3.jpg",
+            caption: "Контактное кольцо турбогенератора 3 - крупный план"
+        },
+        {
+            src: "cr_4.jpg",
+            caption: "Контактное кольцо турбогенератора 4 - процесс обработки"
+        },
+        // ... добавьте остальные 14 фото по аналогии
+        {
+            src: "cr_18.jpg",
+            caption: "Контактное кольцо турбогенератора 18 - готовое изделие"
+        }
+    ]
+},
         'oil-catcher': {
             title: 'Маслоуловитель - Турбогенераторы',
             photos: Array.from({length: 19}, (_, i) => ({
@@ -230,3 +249,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
+
