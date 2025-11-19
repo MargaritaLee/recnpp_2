@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
         'contact-ring': {
             title: 'Контактное кольцо - Турбогенераторы',
             photos: Array.from({length: 18}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23fff8e8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%23f39c12'%3EКонтактное%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%23f39c12'%3EКольцо ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%23f39c12'%3E(Турбо)%3C/text%3E%3C/svg%3E`,
+                src: "cr_main.jpeg" viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23fff8e8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%23f39c12'%3EКонтактное%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%23f39c12'%3EКольцо ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%23f39c12'%3E(Турбо)%3C/text%3E%3C/svg%3E`,
                 caption: `Контактное кольцо турбогенератора ${i + 1} - прецизионное`
             }))
         },
@@ -228,4 +228,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
         albumPhotos.appendChild(pagination);
     }
+
 });
