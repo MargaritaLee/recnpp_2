@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Email sending function (using Formspree as example)
     async function sendEmail(formData) {
         // Using Formspree service - replace with your actual Formspree endpoint
-        const formspreeEndpoint = 'https://formspree.io/f/your-form-id-here';
+        const formspreeEndpoint = 'https://formspree.io/f/xnnedgpd';
         
         const response = await fetch(formspreeEndpoint, {
             method: 'POST',
@@ -270,4 +270,5 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
 });
