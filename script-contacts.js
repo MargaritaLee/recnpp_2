@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Мобильное меню
+    // Мобильное меню (оставляем ваш код)
     const menuToggle = document.querySelector('.menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
     
@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', function() {
         menuToggle.addEventListener('click', function() {
             navMenu.classList.toggle('active');
             
-            // Меняем иконку бургера на крестик
             if (navMenu.classList.contains('active')) {
                 menuToggle.textContent = '✕';
             } else {
@@ -15,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Закрываем меню при клике на ссылку
         const navLinks = document.querySelectorAll('.nav-menu a');
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
@@ -24,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // Закрываем меню при клике вне его области
         document.addEventListener('click', function(event) {
             const isClickInsideNav = event.target.closest('.nav');
             const isClickOnToggle = event.target.closest('.menu-toggle');
@@ -36,23 +33,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Инициализация карты
+    // Инициализация карты (оставляем ваш код)
     if (document.getElementById('map')) {
         var map = L.map('map', {
             attributionControl: false
         }).setView([59.9311, 30.3609], 12);
 
-        // Добавляем слой карты
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© РемЭнергоКомплект НПП',
             maxZoom: 18
         }).addTo(map);
 
-        // Координаты офисов (точные координаты для Санкт-Петербурга)
-        var officeCoords = [59.9311, 30.3609]; // Кондратьевский пр.
-        var productionCoords = [59.9075, 30.3512]; // наб. реки Волковки
+        var officeCoords = [59.9311, 30.3609];
+        var productionCoords = [59.9075, 30.3512];
 
-        // Создаем кастомные иконки для маркеров
         var officeIcon = L.divIcon({
             className: 'office-marker',
             html: '<div style="background: #000066; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>',
@@ -67,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
             iconAnchor: [13, 13]
         });
 
-        // Маркеры
         var officeMarker = L.marker(officeCoords, {
             icon: officeIcon
         }).addTo(map)
@@ -89,31 +82,28 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `);
 
-        // Добавляем кастомное attribution
         L.control.attribution({
             position: 'bottomright',
             prefix: '© РемЭнергоКомплект НПП'
         }).addTo(map);
 
-        // Автоматически открываем попап основного офиса
         officeMarker.openPopup();
     }
 
-    // Обработка формы
+    // ОБНОВЛЕННАЯ обработка формы
     const contactForm = document.getElementById('contactForm');
     const formStatus = document.getElementById('form-status');
 
     if (contactForm && formStatus) {
-        contactForm.addEventListener('submit', async function(e) {
+        contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
             // Получаем данные формы
-            const formData = new FormData(contactForm);
-            const name = formData.get('name');
-            const phone = formData.get('phone');
-            const email = formData.get('email');
-            const subject = formData.get('subject');
-            const message = formData.get('message');
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
 
             // Простая валидация
             if (!name || !phone || !email || !message) {
@@ -131,59 +121,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Показываем статус отправки
-            formStatus.textContent = '⌛ Отправка сообщения...';
-            formStatus.className = 'form-status info';
-            formStatus.style.display = 'block';
+            // Формируем тело письма
+            const emailBody = `
+                НОВОЕ СООБЩЕНИЕ С САЙТА
 
-            // Отправляем через Getform.io
-            try {
-                await sendViaGetform(name, phone, email, subject, message);
+                📅 Дата: ${new Date().toLocaleString('ru-RU')}
                 
-                // Успешная отправка
-                formStatus.textContent = '✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.';
-                formStatus.className = 'form-status success';
-                formStatus.style.display = 'block';
+                👤 Контактная информация:
+                Имя: ${name}
+                Телефон: ${phone}
+                Email: ${email}
+                
+                📋 Тема: ${subject || 'Сообщение с сайта'}
+                
+                📝 Сообщение:
+                ${message}
+                
+                ---
+                Это сообщение отправлено с контактной формы сайта.
+                Пожалуйста, ответьте отправителю в течение 24 часов.
+            `.trim();
 
-                // Очистка формы
-                contactForm.reset();
-
-                // Скрываем статус через 5 секунд
-                setTimeout(() => {
-                    formStatus.style.display = 'none';
-                }, 5000);
-                
-            } catch (error) {
-                console.error('Ошибка отправки через Getform:', error);
-                
-                // Если Getform не сработал, показываем альтернативный способ
-                formStatus.innerHTML = `
-                    <div style="text-align: left;">
-                        <p style="color: #dc3545; font-weight: bold;">❌ Не удалось отправить автоматически</p>
-                        <p>Пожалуйста, отправьте сообщение напрямую на email:</p>
-                        <ul style="margin: 10px 0; padding-left: 20px;">
-                            <li><strong>recnpp-s@yandex.ru</strong></li>
-                            <li><strong>rl.recnpp-s@yandex.ru</strong></li>
-                        </ul>
-                        <button onclick="showEmailTemplate()" style="
-                            background: #0066cc;
-                            color: white;
-                            border: none;
-                            padding: 8px 16px;
-                            border-radius: 4px;
-                            margin-top: 10px;
-                            cursor: pointer;
-                        ">
-                            📋 Показать шаблон письма
-                        </button>
-                    </div>
-                `;
-                formStatus.className = 'form-status error';
-                formStatus.style.display = 'block';
-                
-                // Сохраняем данные для шаблона
-                window.formDataForTemplate = { name, phone, email, subject, message };
-            }
+            // Создаем mailto ссылку для ОБОИХ почт
+            const mailtoLink = createMailtoLink(emailBody, subject, email);
+            
+            // Показываем инструкцию
+            showEmailInstructions(emailBody, mailtoLink);
+            
+            // Очищаем форму
+            contactForm.reset();
         });
 
         // Очистка статуса при изменении полей формы
@@ -197,99 +163,89 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Функция отправки через Getform.io
-    async function sendViaGetform(name, phone, email, subject, message) {
-        // ЗАМЕНИТЕ ЭТОТ URL НА ВАШ GETFORM ENDPOINT
-        // Получите его после регистрации на https://getform.io
-        const GETFORM_ENDPOINT = 'https://getform.io/f/awnvgnob';
+    // Функция создания mailto ссылки
+    function createMailtoLink(body, subject, replyTo) {
+        const encodedSubject = encodeURIComponent(subject || 'Сообщение с сайта');
+        const encodedBody = encodeURIComponent(body);
         
-        const formData = new FormData();
-        
-        // Добавляем данные формы
-        formData.append('name', name);
-        formData.append('phone', phone);
-        formData.append('email', email);
-        formData.append('subject', subject || 'Сообщение с сайта');
-        formData.append('message', message);
-        
-        // Добавляем информацию для отправки на обе почты
-        formData.append('_to', 'recnpp-s@yandex.ru, rl.recnpp-s@yandex.ru');
-        formData.append('_subject', 'Новое сообщение с сайта: ' + (subject || 'Без темы'));
-        formData.append('_replyto', email);
-        
-        // Отправляем запрос
-        const response = await fetch(GETFORM_ENDPOINT, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        return await response.json();
+        // Основной получатель: recnpp-s@yandex.ru
+        // Копия: rl.recnpp-s@yandex.ru
+        return `mailto:recnpp-s@yandex.ru?cc=rl.recnpp-s@yandex.ru&subject=${encodedSubject}&body=${encodedBody}`;
     }
 
-    // Функция для показа шаблона письма
-    window.showEmailTemplate = function() {
-        if (!window.formDataForTemplate) return;
+    // Функция показа инструкций
+    function showEmailInstructions(emailBody, mailtoLink) {
+        const formStatus = document.getElementById('form-status');
+        if (!formStatus) return;
         
-        const { name, phone, email, subject, message } = window.formDataForTemplate;
-        
-        const emailTemplate = `
-Уважаемые коллеги,
-
-Поступило новое сообщение с контактной формы сайта:
-
-📅 Дата: ${new Date().toLocaleString('ru-RU')}
-
-👤 Контактная информация:
-Имя: ${name}
-Телефон: ${phone}
-Email: ${email}
-
-📋 Тема: ${subject || 'Сообщение с сайта'}
-
-📝 Сообщение:
-${message}
-
----
-Это сообщение отправлено через контактную форму сайта.
-Пожалуйста, ответьте отправителю в течение 24 часов.
-        `.trim();
-        
-        // Копируем в буфер обмена
-        navigator.clipboard.writeText(emailTemplate).then(() => {
-            const formStatus = document.getElementById('form-status');
-            if (formStatus) {
-                formStatus.innerHTML = `
-                    <div style="text-align: left;">
-                        <p style="color: #28a745; font-weight: bold;">✅ Текст письма скопирован в буфер обмена!</p>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
-                            <pre style="white-space: pre-wrap; font-family: Arial; font-size: 14px;">
-${emailTemplate}
-                            </pre>
-                        </div>
-                        <p>Теперь:</p>
-                        <ol style="margin: 10px 0; padding-left: 20px;">
-                            <li>Откройте почтовый клиент</li>
-                            <li>Создайте новое письмо</li>
-                            <li>Вставьте текст (Ctrl+V)</li>
-                            <li>Получатель: <strong>recnpp-s@yandex.ru</strong></li>
-                            <li>Копия (CC): <strong>rl.recnpp-s@yandex.ru</strong></li>
-                            <li>Отправьте письмо</li>
-                        </ol>
+        formStatus.innerHTML = `
+            <div style="text-align: left; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                    <div style="background: #28a745; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                        1
                     </div>
-                `;
-                formStatus.className = 'form-status info';
-            }
-        }).catch(err => {
-            console.error('Ошибка копирования:', err);
-            alert('Не удалось скопировать текст. Скопируйте его вручную.');
-        });
+                    <h3 style="margin: 0; color: #28a745;">Письмо готово к отправке</h3>
+                </div>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; border-left: 4px solid #0066cc;">
+                    <p><strong>📧 Письмо будет отправлено на:</strong></p>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li><strong>recnpp-s@yandex.ru</strong> (основной получатель)</li>
+                        <li><strong>rl.recnpp-s@yandex.ru</strong> (копия)</li>
+                    </ul>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="window.open('${mailtoLink}', '_blank')" style="
+                        background: #0066cc;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        flex: 1;
+                        min-width: 200px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                    ">
+                        📨 Открыть почтовый клиент
+                    </button>
+                    
+                    <button onclick="copyToClipboard(\`${escapeHTML(emailBody)}\`)" style="
+                        background: #28a745;
+                        color: white;
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        flex: 1;
+                        min-width: 200px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                    ">
+                        📋 Скопировать текст письма
+                    </button>
+                </div>
+                
+                <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 15px;">
+                    <p style="margin: 0; color: #856404; font-size: 14px;">
+                        💡 <strong>Совет:</strong> Если почтовый клиент не открылся автоматически, 
+                        скопируйте текст выше и отправьте вручную на указанные адреса.
+                    </p>
+                </div>
+            </div>
+        `;
+        formStatus.className = 'form-status success';
+        formStatus.style.display = 'block';
+        
+        // Прокрутка к статусу
+        formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Вспомогательные функции
@@ -297,6 +253,40 @@ ${emailTemplate}
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
+
+    // Функция для экранирования HTML
+    function escapeHTML(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Глобальная функция для копирования в буфер
+    window.copyToClipboard = function(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            // Показываем уведомление
+            const notification = document.createElement('div');
+            notification.textContent = '✅ Текст скопирован в буфер обмена!';
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                z-index: 10000;
+                animation: fadeInOut 3s ease;
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }).catch(err => {
+            alert('Не удалось скопировать текст. Скопируйте его вручную.');
+        });
+    };
 
     // Плавная прокрутка для якорных ссылок
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -312,5 +302,17 @@ ${emailTemplate}
         });
     });
 
-    console.log('Контактная форма настроена для отправки через Getform.io на две почты');
+    // Добавляем стили для анимации
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            90% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    console.log('Контактная форма настроена для отправки на recnpp-s@yandex.ru и rl.recnpp-s@yandex.ru');
 });
