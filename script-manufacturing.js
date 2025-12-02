@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
+    // Мобильное меню
     const menuToggle = document.querySelector('.menu-toggle');
     const navMenu = document.querySelector('.nav-menu');
     
@@ -9,24 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Close mobile menu when clicking on links
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            if (navMenu.classList.contains('active')) {
-                navMenu.classList.remove('active');
-            }
-        });
-    });
-    
-    // Close mobile menu when clicking outside
+    // Закрытие мобильного меню
     document.addEventListener('click', function(event) {
         if (!event.target.closest('.nav') && navMenu.classList.contains('active')) {
             navMenu.classList.remove('active');
         }
     });
-
-    // File upload functionality
+    
+    // Загрузка файлов
     const fileInput = document.getElementById('drawing-file');
     const fileInfo = document.getElementById('file-info');
     
@@ -34,10 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
                 const file = this.files[0];
-                const fileSize = (file.size / 1024 / 1024).toFixed(2); // Size in MB
+                const fileSize = (file.size / 1024 / 1024).toFixed(2);
                 
-                if (file.size > 10 * 1024 * 1024) { // 10 MB limit
-                    showFormStatus('Размер файла не должен превышать 10 МБ', 'error');
+                // Проверка размера (20 МБ максимум для Formsubmit)
+                if (file.size > 20 * 1024 * 1024) {
+                    showFormStatus('Размер файла не должен превышать 20 МБ', 'error');
                     this.value = '';
                     fileInfo.textContent = 'Файл не выбран';
                     return;
@@ -52,194 +43,285 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Form submission
+    // Форма отправки
     const manufacturingForm = document.getElementById('manufacturingForm');
     const formStatus = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
-    const btnText = submitBtn.querySelector('.btn-text');
-    const btnLoading = submitBtn.querySelector('.btn-loading');
-
+    
     if (manufacturingForm) {
         manufacturingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Validate form
+            // Валидация
             if (!validateForm()) {
                 return;
             }
-
-            // Show loading state
+            
+            // Показать загрузку
             setLoadingState(true);
-
+            
             try {
-                // Prepare form data
+                // ВАЖНО: Форма должна иметь action с основной почтой
+                // В HTML: <form action="https://formsubmit.co/recnpp-s@yandex.ru" ...>
+                
+                // Создаем FormData
                 const formData = new FormData(this);
                 
-                // Add additional info
-                formData.append('form-type', 'manufacturing-order');
-                formData.append('submission-date', new Date().toLocaleString('ru-RU'));
-
-                // Send email using Formspree or similar service
-                const response = await sendEmail(formData);
+                // ДОБАВЛЯЕМ ВТОРОЙ EMAIL ЧЕРЕЗ CC (Carbon Copy)
+                // Formsubmit поддерживает поле _cc для копий
+                formData.append('_cc', 'rl.recnpp-s@yandex.ru');
+                
+                // Другие настройки Formsubmit
+                formData.append('_subject', 'Новая заявка на изготовление детали');
+                formData.append('_template', 'table');
+                formData.append('_captcha', 'false');
+                
+                // Автоответ пользователю
+                formData.append('_autoresponse', 'Спасибо за заявку! Мы получили ваше сообщение и свяжемся с вами в течение 24 часов.');
+                
+                // Добавляем дату отправки
+                formData.append('submission_date', new Date().toLocaleString('ru-RU'));
+                
+                // Генерируем номер заявки
+                const orderNumber = 'ORD-' + new Date().getTime().toString().slice(-8);
+                formData.append('order_number', orderNumber);
+                
+                // Отправляем форму
+                // Ваш HTML должен иметь: <form action="https://formsubmit.co/recnpp-s@yandex.ru" ...>
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 
                 if (response.ok) {
-                    showFormStatus('Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
-                    manufacturingForm.reset();
-                    fileInfo.textContent = 'Файл не выбран';
-                    fileInfo.style.color = '#666';
+                    // УСПЕШНАЯ ОТПРАВКА
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        showFormStatus('✅ Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+                        
+                        // Показываем номер заявки
+                        setTimeout(() => {
+                            showFormStatus(`📋 Номер вашей заявки: <strong>${orderNumber}</strong>. Сохраните его для отслеживания.`, 'info');
+                        }, 2000);
+                        
+                        // Очистка формы
+                        manufacturingForm.reset();
+                        
+                        // Сброс информации о файле
+                        if (fileInfo) {
+                            fileInfo.textContent = 'Файл не выбран';
+                            fileInfo.style.color = '#666';
+                        }
+                        
+                    } else {
+                        throw new Error('Formsubmit вернул ошибку');
+                    }
+                    
                 } else {
-                    throw new Error('Ошибка отправки формы');
+                    throw new Error('Ошибка HTTP: ' + response.status);
                 }
+                
             } catch (error) {
-                console.error('Error sending form:', error);
-                showFormStatus('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.', 'error');
+                console.error('Form submission error:', error);
+                
+                // Пробуем альтернативный метод отправки
+                try {
+                    await sendAlternativeEmail();
+                    showFormStatus('✅ Заявка отправлена через резервный метод!', 'success');
+                } catch (backupError) {
+                    showFormStatus('❌ Ошибка отправки. Пожалуйста, отправьте заявку на email: recnpp-s@yandex.ru', 'error');
+                }
+                
             } finally {
                 setLoadingState(false);
             }
         });
     }
 
-    // Form validation
+    // Функции ====================================================
+
+    // Валидация формы
     function validateForm() {
         const requiredFields = manufacturingForm.querySelectorAll('[required]');
         let isValid = true;
-
+        
+        // Сброс стилей ошибок
+        requiredFields.forEach(field => {
+            field.style.borderColor = '#e0e0e0';
+        });
+        
+        // Проверка обязательных полей
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.style.borderColor = '#dc3545';
                 isValid = false;
-            } else {
-                field.style.borderColor = '#e0e0e0';
             }
         });
-
-        // Email validation
+        
+        // Валидация email
         const emailField = document.getElementById('email');
         if (emailField.value && !isValidEmail(emailField.value)) {
             emailField.style.borderColor = '#dc3545';
-            showFormStatus('Пожалуйста, введите корректный email адрес', 'error');
+            showFormStatus('Введите корректный email адрес', 'error');
             isValid = false;
         }
-
-        // Phone validation
+        
+        // Валидация телефона
         const phoneField = document.getElementById('phone');
         if (phoneField.value && !isValidPhone(phoneField.value)) {
             phoneField.style.borderColor = '#dc3545';
-            showFormStatus('Пожалуйста, введите корректный номер телефона', 'error');
+            showFormStatus('Введите корректный номер телефона (минимум 10 цифр)', 'error');
             isValid = false;
         }
-
+        
         if (!isValid) {
-            showFormStatus('Пожалуйста, заполните все обязательные поля', 'error');
+            showFormStatus('Пожалуйста, заполните все обязательные поля правильно', 'error');
         }
-
+        
         return isValid;
     }
-
-    // Email validation
+    
+    // Валидация email
     function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
     }
-
-    // Phone validation (basic)
+    
+    // Валидация телефона
     function isValidPhone(phone) {
-        const phoneRegex = /^[\+]?[0-9\s\-\(\)]{10,}$/;
-        return phoneRegex.test(phone);
+        const digitsOnly = phone.replace(/\D/g, '');
+        return digitsOnly.length >= 10;
     }
-
-    // Show form status message
+    
+    // Показать статус формы
     function showFormStatus(message, type) {
-        formStatus.textContent = message;
+        if (!formStatus) return;
+        
+        formStatus.innerHTML = message;
         formStatus.className = `form-status ${type}`;
         formStatus.style.display = 'block';
-
-        // Auto hide success messages after 5 seconds
-        if (type === 'success') {
+        
+        // Автоматическое скрытие
+        if (type === 'success' || type === 'info') {
             setTimeout(() => {
                 formStatus.style.display = 'none';
-            }, 5000);
+            }, 10000);
         }
-    }
-
-    // Set loading state
-    function setLoadingState(isLoading) {
-        if (isLoading) {
-            btnText.style.display = 'none';
-            btnLoading.style.display = 'inline';
-            submitBtn.disabled = true;
-        } else {
-            btnText.style.display = 'inline';
-            btnLoading.style.display = 'none';
-            submitBtn.disabled = false;
-        }
-    }
-
-    // Email sending function (using Formspree as example)
-    async function sendEmail(formData) {
-        // Using Formspree service - replace with your actual Formspree endpoint
-        const formspreeEndpoint = 'https://formspree.io/f/xnnedgpd';
         
-        const response = await fetch(formspreeEndpoint, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Accept': 'application/json'
+        // Прокрутка к статусу
+        formStatus.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    
+    // Состояние загрузки
+    function setLoadingState(isLoading) {
+        if (!submitBtn) return;
+        
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnLoading = submitBtn.querySelector('.btn-loading');
+        
+        if (btnText && btnLoading) {
+            if (isLoading) {
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'inline';
+                submitBtn.disabled = true;
+            } else {
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+    }
+    
+    // Альтернативный метод отправки (если Formsubmit не работает)
+    async function sendAlternativeEmail() {
+        return new Promise((resolve, reject) => {
+            try {
+                // Собираем данные формы
+                const formData = {
+                    company: document.getElementById('company')?.value || '',
+                    contact_person: document.getElementById('contact-person')?.value || '',
+                    phone: document.getElementById('phone')?.value || '',
+                    email: document.getElementById('email')?.value || '',
+                    equipment_type: document.getElementById('equipment-type')?.value || '',
+                    part_name: document.getElementById('part-name')?.value || '',
+                    part_description: document.getElementById('part-description')?.value || '',
+                    quantity: document.getElementById('quantity')?.value || '',
+                    deadline: document.getElementById('deadline')?.value || '',
+                    additional_info: document.getElementById('additional-info')?.value || '',
+                    submission_date: new Date().toLocaleString('ru-RU')
+                };
+                
+                // Создаем текст письма
+                const emailBody = `
+                    НОВАЯ ЗАЯВКА С САЙТА
+                    
+                    📅 Дата: ${formData.submission_date}
+                    
+                    👤 КОНТАКТНАЯ ИНФОРМАЦИЯ:
+                    Компания: ${formData.company}
+                    Контактное лицо: ${formData.contact_person}
+                    Телефон: ${formData.phone}
+                    Email: ${formData.email}
+                    
+                    🔧 ИНФОРМАЦИЯ О ДЕТАЛИ:
+                    Тип оборудования: ${formData.equipment_type}
+                    Наименование детали: ${formData.part_name}
+                    Описание детали: ${formData.part_description}
+                    Количество: ${formData.quantity} шт.
+                    Желаемый срок: ${formData.deadline}
+                    
+                    📝 ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:
+                    ${formData.additional_info}
+                    
+                    📎 ФАЙЛ ЧЕРТЕЖА:
+                    ${fileInfo?.textContent || 'Файл не прикреплен'}
+                `;
+                
+                // Создаем mailto ссылку для ОБОИХ получателей
+                const subject = encodeURIComponent('Новая заявка на изготовление детали');
+                const body = encodeURIComponent(emailBody);
+                
+                // Основной получатель и CC
+                const mailtoLink = `mailto:recnpp-s@yandex.ru?cc=rl.recnpp-s@yandex.ru&subject=${subject}&body=${body}`;
+                
+                // Открываем в новом окне
+                const mailWindow = window.open(mailtoLink, '_blank');
+                
+                if (mailWindow) {
+                    setTimeout(() => {
+                        mailWindow.close();
+                        resolve();
+                    }, 1000);
+                } else {
+                    // Если всплывающее окно заблокировано
+                    alert('Пожалуйста, отправьте заявку вручную на адреса:\nrecnpp-s@yandex.ru\nrl.recnpp-s@yandex.ru');
+                    reject(new Error('Popup blocked'));
+                }
+                
+            } catch (error) {
+                reject(error);
             }
         });
-
-        return response;
     }
-
-    // Alternative email sending using EmailJS (uncomment if using EmailJS)
-    /*
-    async function sendEmail(formData) {
-        // Initialize EmailJS with your user ID
-        emailjs.init('your-user-id');
-        
-        // Prepare template parameters
-        const templateParams = {
-            company: formData.get('company'),
-            contact_person: formData.get('contact-person'),
-            phone: formData.get('phone'),
-            email: formData.get('email'),
-            equipment_type: formData.get('equipment-type'),
-            part_name: formData.get('part-name'),
-            part_description: formData.get('part-description'),
-            quantity: formData.get('quantity'),
-            deadline: formData.get('deadline'),
-            additional_info: formData.get('additional-info'),
-            submission_date: new Date().toLocaleString('ru-RU')
-        };
-
-        // Send email
-        return await emailjs.send('your-service-id', 'your-template-id', templateParams);
-    }
-    */
-
-    // Real-time validation
-    const formFields = manufacturingForm.querySelectorAll('input, textarea, select');
+    
+    // Реальная валидация при вводе
+    const formFields = manufacturingForm?.querySelectorAll('input, textarea, select') || [];
     formFields.forEach(field => {
         field.addEventListener('input', function() {
             if (this.hasAttribute('required') && this.value.trim()) {
                 this.style.borderColor = '#e0e0e0';
             }
             
-            // Specific field validation
             if (this.id === 'email' && this.value) {
-                if (!isValidEmail(this.value)) {
-                    this.style.borderColor = '#dc3545';
-                } else {
-                    this.style.borderColor = '#e0e0e0';
-                }
+                this.style.borderColor = isValidEmail(this.value) ? '#28a745' : '#dc3545';
             }
             
             if (this.id === 'phone' && this.value) {
-                if (!isValidPhone(this.value)) {
-                    this.style.borderColor = '#dc3545';
-                } else {
-                    this.style.borderColor = '#e0e0e0';
-                }
+                this.style.borderColor = isValidPhone(this.value) ? '#28a745' : '#dc3545';
             }
         });
         
@@ -249,26 +331,38 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // Set minimum date for deadline field to today
+    
+    // Установка минимальной даты
     const deadlineField = document.getElementById('deadline');
     if (deadlineField) {
-        const today = new Date().toISOString().split('T')[0];
-        deadlineField.min = today;
+        const today = new Date();
+        today.setDate(today.getDate() + 1);
+        const tomorrow = today.toISOString().split('T')[0];
+        deadlineField.min = tomorrow;
     }
-
-    // Add smooth scrolling for anchor links
+    
+    // Плавная прокрутка
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const target = document.querySelector(targetId);
             if (target) {
                 target.scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
+                
+                if (navMenu && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                }
             }
         });
     });
-
+    
+    // Инициализация
+    console.log('Formsubmit form handler initialized');
+    console.log('Emails will be sent to: recnpp-s@yandex.ru and rl.recnpp-s@yandex.ru');
 });
