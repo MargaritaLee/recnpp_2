@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const formStatus = document.getElementById('form-status');
 
     if (contactForm && formStatus) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Получаем данные формы
@@ -123,20 +123,67 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // В реальном приложении здесь был бы AJAX запрос к серверу
-            // Для демонстрации просто показываем успешное сообщение
-            
-            formStatus.textContent = 'Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.';
-            formStatus.className = 'form-status success';
+            // Валидация email
+            if (!isValidEmail(email)) {
+                formStatus.textContent = 'Пожалуйста, введите корректный email адрес';
+                formStatus.className = 'form-status error';
+                formStatus.style.display = 'block';
+                return;
+            }
+
+            // Показываем статус отправки
+            formStatus.textContent = '⌛ Отправка сообщения...';
+            formStatus.className = 'form-status info';
             formStatus.style.display = 'block';
 
-            // Очистка формы
-            contactForm.reset();
+            // Отправляем через Getform.io
+            try {
+                await sendViaGetform(name, phone, email, subject, message);
+                
+                // Успешная отправка
+                formStatus.textContent = '✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.';
+                formStatus.className = 'form-status success';
+                formStatus.style.display = 'block';
 
-            // Скрываем статус через 5 секунд
-            setTimeout(() => {
-                formStatus.style.display = 'none';
-            }, 5000);
+                // Очистка формы
+                contactForm.reset();
+
+                // Скрываем статус через 5 секунд
+                setTimeout(() => {
+                    formStatus.style.display = 'none';
+                }, 5000);
+                
+            } catch (error) {
+                console.error('Ошибка отправки через Getform:', error);
+                
+                // Если Getform не сработал, показываем альтернативный способ
+                formStatus.innerHTML = `
+                    <div style="text-align: left;">
+                        <p style="color: #dc3545; font-weight: bold;">❌ Не удалось отправить автоматически</p>
+                        <p>Пожалуйста, отправьте сообщение напрямую на email:</p>
+                        <ul style="margin: 10px 0; padding-left: 20px;">
+                            <li><strong>recnpp-s@yandex.ru</strong></li>
+                            <li><strong>rl.recnpp-s@yandex.ru</strong></li>
+                        </ul>
+                        <button onclick="showEmailTemplate()" style="
+                            background: #0066cc;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            border-radius: 4px;
+                            margin-top: 10px;
+                            cursor: pointer;
+                        ">
+                            📋 Показать шаблон письма
+                        </button>
+                    </div>
+                `;
+                formStatus.className = 'form-status error';
+                formStatus.style.display = 'block';
+                
+                // Сохраняем данные для шаблона
+                window.formDataForTemplate = { name, phone, email, subject, message };
+            }
         });
 
         // Очистка статуса при изменении полей формы
@@ -148,6 +195,107 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         });
+    }
+
+    // Функция отправки через Getform.io
+    async function sendViaGetform(name, phone, email, subject, message) {
+        // ЗАМЕНИТЕ ЭТОТ URL НА ВАШ GETFORM ENDPOINT
+        // Получите его после регистрации на https://getform.io
+        const GETFORM_ENDPOINT = 'https://getform.io/f/awnvgnob';
+        
+        const formData = new FormData();
+        
+        // Добавляем данные формы
+        formData.append('name', name);
+        formData.append('phone', phone);
+        formData.append('email', email);
+        formData.append('subject', subject || 'Сообщение с сайта');
+        formData.append('message', message);
+        
+        // Добавляем информацию для отправки на обе почты
+        formData.append('_to', 'recnpp-s@yandex.ru, rl.recnpp-s@yandex.ru');
+        formData.append('_subject', 'Новое сообщение с сайта: ' + (subject || 'Без темы'));
+        formData.append('_replyto', email);
+        
+        // Отправляем запрос
+        const response = await fetch(GETFORM_ENDPOINT, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        return await response.json();
+    }
+
+    // Функция для показа шаблона письма
+    window.showEmailTemplate = function() {
+        if (!window.formDataForTemplate) return;
+        
+        const { name, phone, email, subject, message } = window.formDataForTemplate;
+        
+        const emailTemplate = `
+Уважаемые коллеги,
+
+Поступило новое сообщение с контактной формы сайта:
+
+📅 Дата: ${new Date().toLocaleString('ru-RU')}
+
+👤 Контактная информация:
+Имя: ${name}
+Телефон: ${phone}
+Email: ${email}
+
+📋 Тема: ${subject || 'Сообщение с сайта'}
+
+📝 Сообщение:
+${message}
+
+---
+Это сообщение отправлено через контактную форму сайта.
+Пожалуйста, ответьте отправителю в течение 24 часов.
+        `.trim();
+        
+        // Копируем в буфер обмена
+        navigator.clipboard.writeText(emailTemplate).then(() => {
+            const formStatus = document.getElementById('form-status');
+            if (formStatus) {
+                formStatus.innerHTML = `
+                    <div style="text-align: left;">
+                        <p style="color: #28a745; font-weight: bold;">✅ Текст письма скопирован в буфер обмена!</p>
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0;">
+                            <pre style="white-space: pre-wrap; font-family: Arial; font-size: 14px;">
+${emailTemplate}
+                            </pre>
+                        </div>
+                        <p>Теперь:</p>
+                        <ol style="margin: 10px 0; padding-left: 20px;">
+                            <li>Откройте почтовый клиент</li>
+                            <li>Создайте новое письмо</li>
+                            <li>Вставьте текст (Ctrl+V)</li>
+                            <li>Получатель: <strong>recnpp-s@yandex.ru</strong></li>
+                            <li>Копия (CC): <strong>rl.recnpp-s@yandex.ru</strong></li>
+                            <li>Отправьте письмо</li>
+                        </ol>
+                    </div>
+                `;
+                formStatus.className = 'form-status info';
+            }
+        }).catch(err => {
+            console.error('Ошибка копирования:', err);
+            alert('Не удалось скопировать текст. Скопируйте его вручную.');
+        });
+    }
+
+    // Вспомогательные функции
+    function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
     }
 
     // Плавная прокрутка для якорных ссылок
@@ -163,4 +311,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    console.log('Контактная форма настроена для отправки через Getform.io на две почты');
 });
