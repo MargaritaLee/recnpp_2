@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style-manufacturing.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Header (без изменений) -->
     <header class="header">
         <nav class="nav">
             <div class="logo">
@@ -31,7 +31,7 @@
 
     <!-- Main Content -->
     <main class="main-content manufacturing-page">
-        <!-- Hero Section -->
+        <!-- Hero Section (без изменений) -->
         <section class="manufacturing-hero">
             <div class="container">
                 <h1>Изготовление деталей</h1>
@@ -39,7 +39,7 @@
             </div>
         </section>
 
-        <!-- Manufacturing Info -->
+        <!-- Manufacturing Info (без изменений) -->
         <section class="manufacturing-info-section">
             <div class="container">
                 <h2 class="section-title">Наши возможности</h2>
@@ -65,27 +65,21 @@
             <div class="container">
                 <h2 class="section-title">Заявка на изготовление деталей</h2>
                 <div class="form-container">
+                    <!-- Сообщения будут здесь -->
                     <div id="form-status" class="form-status"></div>
-                    <!-- ОБНОВЛЕННАЯ ФОРМА для Formsubmit -->
+                    
+                    <!-- ФОРМА Getform.io -->
                     <form 
                         class="manufacturing-form" 
                         id="manufacturingForm"
-                        action="https://formsubmit.co/recnpp-s@yandex.ru" 
                         method="POST"
                         enctype="multipart/form-data">
                         
-                        <!-- СКРЫТЫЕ ПОЛЯ ДЛЯ FORMSUBMIT -->
-                        <input type="hidden" name="_cc" value="rl.recnpp-s@yandex.ru">
-                        <input type="hidden" name="_subject" value="Новая заявка на изготовление детали с сайта">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_autoresponse" value="Спасибо за заявку! Мы получили ваше сообщение и свяжемся с вами в течение 24 часов.">
-                        <input type="hidden" name="_next" value="https://вашсайт.ru/manufacturing.html?success=true">
+                        <!-- Скрытые поля для Getform -->
+                        <input type="hidden" name="_subject" value="Новая заявка на изготовление детали">
+                        <input type="hidden" name="_to" value="recnpp-s@yandex.ru, rl.recnpp-s@yandex.ru">
+                        <input type="hidden" name="_replyto" value="{{email}}">
                         
-                        <!-- Анти-спам поле -->
-                        <input type="text" name="_honey" style="display:none">
-                        
-                        <!-- Далее идут обычные поля формы -->
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="company">Название организации *</label>
@@ -122,12 +116,12 @@
 
                         <div class="form-group">
                             <label for="part-name">Наименование детали *</label>
-                            <input type="text" id="part-name" name="part-name" required placeholder="Например: Подбандажный сегмент, вал ротора, статор и т.д.">
+                            <input type="text" id="part-name" name="part-name" required placeholder="Например: Подбандажный сегмент, вал ротора, статор...">
                         </div>
 
                         <div class="form-group">
                             <label for="part-description">Описание детали и технические требования *</label>
-                            <textarea id="part-description" name="part-description" rows="4" required placeholder="Опишите деталь, укажите материал, размеры, особенности, условия эксплуатации..."></textarea>
+                            <textarea id="part-description" name="part-description" rows="4" required placeholder="Опишите деталь, материал, размеры, особенности..."></textarea>
                         </div>
 
                         <div class="form-row">
@@ -142,157 +136,68 @@
                         </div>
 
                         <div class="form-group file-upload-group">
-                            <label for="drawing-file">Прикрепить чертеж или техническую документацию (до 20 МБ)</label>
+                            <label for="drawing-file">Прикрепить чертеж (до 10 МБ)</label>
                             <div class="file-upload-wrapper">
-                                <input type="file" id="drawing-file" name="attachment" accept=".pdf,.dwg,.dxf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx,.zip,.rar,.stp,.step,.igs,.iges">
+                                <input type="file" id="drawing-file" name="file" accept=".pdf,.jpg,.jpeg,.png,.dwg,.dxf,.doc,.docx">
                                 <label for="drawing-file" class="file-upload-label">
                                     <span class="file-upload-text">Выберите файл</span>
                                     <span class="file-upload-button">Обзор</span>
                                 </label>
                             </div>
                             <div class="file-info" id="file-info">Файл не выбран</div>
-                            <small class="file-hint">Поддерживаемые форматы: PDF, DWG, DXF, JPG, PNG, DOC, DOCX, XLS, XLSX, ZIP, RAR, STP, IGS</small>
                         </div>
 
                         <div class="form-group">
                             <label for="additional-info">Дополнительная информация</label>
-                            <textarea id="additional-info" name="additional-info" rows="3" placeholder="Дополнительные пожелания, требования к материалам, особые условия доставки, контактная информация для согласования..."></textarea>
+                            <textarea id="additional-info" name="additional-info" rows="3" placeholder="Дополнительные пожелания или комментарии..."></textarea>
                         </div>
 
                         <div class="form-agreement">
                             <input type="checkbox" id="agreement" name="agreement" required>
                             <label for="agreement">
-                                Я согласен на обработку персональных данных и подтверждаю, что предоставленная информация корректна *
+                                Я согласен на обработку персональных данных *
                             </label>
                         </div>
 
                         <div class="form-submit">
                             <button type="submit" class="submit-btn" id="submit-btn">
                                 <span class="btn-text">Отправить заявку</span>
-                                <span class="btn-loading" style="display: none;">
-                                    <svg class="loading-spinner" width="20" height="20" viewBox="0 0 50 50">
-                                        <circle cx="25" cy="25" r="20" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round">
-                                            <animate attributeName="stroke-dashoffset" dur="1.5s" repeatCount="indefinite" from="0" to="126"/>
-                                            <animate attributeName="stroke-dasharray" dur="1.5s" repeatCount="indefinite" values="24 102;126 0;24 102"/>
-                                        </circle>
-                                    </svg>
-                                    Отправка...
-                                </span>
+                                <span class="btn-loading" style="display: none;">⌛ Отправка...</span>
                             </button>
-                            <p class="form-note">После отправки вы получите подтверждение на указанный email. Если письмо не пришло, проверьте папку "Спам".</p>
+                            <p class="form-note">После отправки вы получите копию заявки на указанный email.</p>
                         </div>
                     </form>
                 </div>
             </div>
         </section>
 
-        <!-- How It Works Section -->
-        <section class="how-it-works-section">
-            <div class="container">
-                <h2 class="section-title">Как мы работаем</h2>
-                <div class="steps-grid">
-                    <div class="step-card">
-                        <div class="step-number">1</div>
-                        <h3>Заявка</h3>
-                        <p>Вы заполняете форму на сайте или отправляете техническое задание на email</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">2</div>
-                        <h3>Анализ</h3>
-                        <p>Мы изучаем ваши требования, проводим технический анализ и расчет стоимости</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">3</div>
-                        <h3>Согласование</h3>
-                        <p>Согласовываем с вами сроки, стоимость и условия изготовления</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">4</div>
-                        <h3>Изготовление</h3>
-                        <p>Производим детали с контролем качества на каждом этапе</p>
-                    </div>
-                    <div class="step-card">
-                        <div class="step-number">5</div>
-                        <h3>Доставка</h3>
-                        <p>Организуем доставку и предоставляем сопроводительную документацию</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- FAQ Section -->
-        <section class="faq-section">
-            <div class="container">
-                <h2 class="section-title">Часто задаваемые вопросы</h2>
-                <div class="faq-list">
-                    <div class="faq-item">
-                        <div class="faq-question">Сколько времени занимает рассмотрение заявки?</div>
-                        <div class="faq-answer">Мы отвечаем на все заявки в течение 1 рабочего дня. Для сложных технических заданий может потребоваться до 2 рабочих дней.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">Какие файлы можно прикреплять к заявке?</div>
-                        <div class="faq-answer">Мы принимаем чертежи в форматах DWG, DXF, PDF; изображения JPG, PNG; документы DOC, DOCX, XLS, XLSX; архивы ZIP, RAR. Максимальный размер файла - 20 МБ.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">Какой минимальный срок изготовления?</div>
-                        <div class="faq-answer">Сроки зависят от сложности детали и загрузки производства. Минимальный срок для простых деталей - от 5 рабочих дней.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question">Работаете ли вы с НДС?</div>
-                        <div class="faq-answer">Да, мы работаем как с НДС, так и без НДС в зависимости от статуса вашей организации.</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contact Info -->
+        <!-- Дополнительные секции (можно оставить как есть) -->
         <section class="contact-info-section">
             <div class="container">
-                <h2 class="section-title">Другие способы связи</h2>
+                <h2 class="section-title">Контакты для связи</h2>
                 <div class="contact-methods">
                     <div class="contact-method">
                         <div class="contact-icon">📧</div>
-                        <h3>По электронной почте</h3>
-                        <p>Вы можете отправить техническое задание прямо на email:</p>
+                        <h3>Email для заявок</h3>
                         <ul class="contact-emails">
                             <li><strong>Основной:</strong> recnpp-s@yandex.ru</li>
                             <li><strong>Резервный:</strong> rl.recnpp-s@yandex.ru</li>
-                            <li><strong>Технические вопросы:</strong> ep.recnpp-s@yandex.ru</li>
                         </ul>
                     </div>
                     <div class="contact-method">
                         <div class="contact-icon">📱</div>
-                        <h3>По телефону</h3>
-                        <p>Позвоните нам для оперативного обсуждения:</p>
+                        <h3>Телефоны</h3>
                         <ul class="contact-phones">
                             <li>+7 (911) 753-97-41</li>
                             <li>+7 (911) 179-79-85</li>
-                            <li>+7 (953) 161-84-69</li>
                         </ul>
-                        <p class="contact-hours">Время работы: Пн-Пт с 9:00 до 18:00</p>
-                    </div>
-                    <div class="contact-method">
-                        <div class="contact-icon">📍</div>
-                        <h3>Личная встреча</h3>
-                        <p>Вы можете приехать к нам в офис для обсуждения проекта:</p>
-                        <address>
-                            <strong>Адрес производства:</strong><br>
-                            192007, г. Санкт-Петербург,<br>
-                            набережная реки Волковки, 17
-                        </address>
-                        <address>
-                            <strong>Юридический адрес:</strong><br>
-                            195009, г. Санкт-Петербург,<br>
-                            пр-кт Кондратьевский, д.3, к.4,<br>
-                            Лит.Д, помещ.2Н-2
-                        </address>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Footer (без изменений) -->
     <footer class="footer">
         <div class="container">
             <div class="footer-logo-section">
@@ -329,53 +234,11 @@
             </div>
             <div class="footer-bottom">
                 <p>&copy; 2025 РемЭнергоКомплект НПП. Все права защищены.</p>
-                <p class="formsubmit-note">Форма заявки работает через сервис Formsubmit.co</p>
             </div>
         </div>
     </footer>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-success-icon">✅</div>
-            <h2>Заявка успешно отправлена!</h2>
-            <p>Мы получили вашу заявку и свяжемся с вами в течение 24 часов.</p>
-            <p>На указанный email отправлено подтверждение.</p>
-            <div id="orderNumber" class="order-number"></div>
-            <button id="closeModal" class="modal-close-btn">Закрыть</button>
-        </div>
-    </div>
-
+    <!-- JavaScript -->
     <script src="script-manufacturing.js"></script>
-    <!-- Форма для мобильных устройств: ручное подтверждение email -->
-    <script>
-        // Проверка на мобильных устройствах
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            document.addEventListener('DOMContentLoaded', function() {
-                const form = document.getElementById('manufacturingForm');
-                if (form) {
-                    const emailField = document.getElementById('email');
-                    const confirmField = document.createElement('div');
-                    confirmField.className = 'form-group';
-                    confirmField.innerHTML = `
-                        <label for="email-confirm">Подтверждение email *</label>
-                        <input type="email" id="email-confirm" name="email-confirm" required>
-                        <small style="color: #666;">Пожалуйста, введите email еще раз для подтверждения</small>
-                    `;
-                    emailField.parentNode.parentNode.appendChild(confirmField);
-                    
-                    form.addEventListener('submit', function(e) {
-                        const email = emailField.value;
-                        const confirm = document.getElementById('email-confirm').value;
-                        
-                        if (email !== confirm) {
-                            e.preventDefault();
-                            alert('Email адреса не совпадают. Пожалуйста, проверьте правильность ввода.');
-                        }
-                    });
-                }
-            });
-        }
-    </script>
 </body>
 </html>
