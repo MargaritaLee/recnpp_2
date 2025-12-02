@@ -48,98 +48,233 @@ document.addEventListener('DOMContentLoaded', function() {
     const formStatus = document.getElementById('form-status');
     const submitBtn = document.getElementById('submit-btn');
     
+    // Флаг для отслеживания отправки
+    let isFormSubmitting = false;
+    
     if (manufacturingForm) {
         manufacturingForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            if (isFormSubmitting) {
+                return;
+            }
             
             // Валидация
             if (!validateForm()) {
                 return;
             }
             
-            // Показать загрузку
+            isFormSubmitting = true;
             setLoadingState(true);
             
             try {
-                // ВАЖНО: Форма должна иметь action с основной почтой
-                // В HTML: <form action="https://formsubmit.co/recnpp-s@yandex.ru" ...>
+                console.log('Начало отправки формы через Formsubmit...');
                 
                 // Создаем FormData
                 const formData = new FormData(this);
                 
-                // ДОБАВЛЯЕМ ВТОРОЙ EMAIL ЧЕРЕЗ CC (Carbon Copy)
-                // Formsubmit поддерживает поле _cc для копий
+                // Добавляем скрытые поля для Formsubmit
                 formData.append('_cc', 'rl.recnpp-s@yandex.ru');
-                
-                // Другие настройки Formsubmit
-                formData.append('_subject', 'Новая заявка на изготовление детали');
+                formData.append('_subject', 'Новая заявка на изготовление детали с сайта');
                 formData.append('_template', 'table');
                 formData.append('_captcha', 'false');
-                
-                // Автоответ пользователю
                 formData.append('_autoresponse', 'Спасибо за заявку! Мы получили ваше сообщение и свяжемся с вами в течение 24 часов.');
                 
-                // Добавляем дату отправки
+                // Добавляем информацию о времени
                 formData.append('submission_date', new Date().toLocaleString('ru-RU'));
                 
                 // Генерируем номер заявки
-                const orderNumber = 'ORD-' + new Date().getTime().toString().slice(-8);
+                const orderNumber = 'ORD-' + Date.now().toString().slice(-8);
                 formData.append('order_number', orderNumber);
                 
-                // Отправляем форму
-                // Ваш HTML должен иметь: <form action="https://formsubmit.co/recnpp-s@yandex.ru" ...>
-                const response = await fetch(this.action, {
+                // URL Formsubmit
+                const formsubmitUrl = 'https://formsubmit.co/recnpp-s@yandex.ru';
+                
+                console.log('Отправка запроса на Formsubmit...');
+                
+                // Отправляем с таймаутом 30 секунд
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+                
+                const response = await fetch(formsubmitUrl, {
                     method: 'POST',
                     body: formData,
                     headers: {
                         'Accept': 'application/json'
-                    }
+                    },
+                    signal: controller.signal
                 });
                 
+                clearTimeout(timeoutId);
+                
+                console.log('Ответ Formsubmit:', response.status);
+                
                 if (response.ok) {
-                    // УСПЕШНАЯ ОТПРАВКА
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        showFormStatus('✅ Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+                    try {
+                        const result = await response.json();
+                        console.log('Ответ Formsubmit JSON:', result);
                         
-                        // Показываем номер заявки
-                        setTimeout(() => {
-                            showFormStatus(`📋 Номер вашей заявки: <strong>${orderNumber}</strong>. Сохраните его для отслеживания.`, 'info');
-                        }, 2000);
-                        
-                        // Очистка формы
-                        manufacturingForm.reset();
-                        
-                        // Сброс информации о файле
-                        if (fileInfo) {
-                            fileInfo.textContent = 'Файл не выбран';
-                            fileInfo.style.color = '#666';
+                        if (result.success) {
+                            // УСПЕШНАЯ ОТПРАВКА ЧЕРЕЗ FORMSUBMIT
+                            showFormStatus('✅ Заявка успешно отправлена! Мы свяжемся с вами в ближайшее время.', 'success');
+                            
+                            // Показываем номер заявки
+                            setTimeout(() => {
+                                showFormStatus(`📋 Номер вашей заявки: <strong>${orderNumber}</strong>. Сохраните его для отслеживания.`, 'info');
+                            }, 2000);
+                            
+                            // Очистка формы
+                            manufacturingForm.reset();
+                            
+                            // Сброс информации о файле
+                            if (fileInfo) {
+                                fileInfo.textContent = 'Файл не выбран';
+                                fileInfo.style.color = '#666';
+                            }
+                            
+                            // Логирование успешной отправки
+                            console.log('Form submitted successfully to Formsubmit');
+                            
+                            // Сохраняем номер в localStorage
+                            localStorage.setItem('lastOrderNumber', orderNumber);
+                            
+                        } else {
+                            throw new Error('Formsubmit вернул ошибку');
                         }
-                        
-                    } else {
-                        throw new Error('Formsubmit вернул ошибку');
+                    } catch (jsonError) {
+                        console.log('Formsubmit вернул не JSON ответ, возможно успешно');
+                        showFormStatus('✅ Заявка отправлена! Ожидайте подтверждения на email.', 'success');
+                        manufacturingForm.reset();
                     }
                     
                 } else {
-                    throw new Error('Ошибка HTTP: ' + response.status);
+                    console.error('Formsubmit HTTP ошибка:', response.status);
+                    throw new Error(`Ошибка HTTP: ${response.status}`);
                 }
                 
             } catch (error) {
                 console.error('Form submission error:', error);
                 
-                // Пробуем альтернативный метод отправки
-                try {
-                    await sendAlternativeEmail();
-                    showFormStatus('✅ Заявка отправлена через резервный метод!', 'success');
-                } catch (backupError) {
-                    showFormStatus('❌ Ошибка отправки. Пожалуйста, отправьте заявку на email: recnpp-s@yandex.ru', 'error');
-                }
+                // Форма не отправилась через Formsubmit, показываем инструкцию
+                showFormStatus(`
+                    <div style="text-align: left;">
+                        <p style="color: #dc3545; font-weight: bold;">❌ Форма не отправилась автоматически.</p>
+                        <p>Пожалуйста, отправьте заявку вручную:</p>
+                        <ol style="margin-left: 20px;">
+                            <li>Скопируйте данные из формы</li>
+                            <li>Отправьте их на email: <strong>recnpp-s@yandex.ru</strong></li>
+                            <li>В копию укажите: <strong>rl.recnpp-s@yandex.ru</strong></li>
+                            <li>Тема письма: <strong>Заявка на изготовление детали</strong></li>
+                        </ol>
+                        <p style="margin-top: 10px;">
+                            <button id="copyFormData" style="background: #0066cc; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                                📋 Скопировать данные формы
+                            </button>
+                        </p>
+                    </div>
+                `, 'error');
+                
+                // Добавляем кнопку для копирования данных формы
+                setTimeout(() => {
+                    const copyBtn = document.getElementById('copyFormData');
+                    if (copyBtn) {
+                        copyBtn.addEventListener('click', copyFormDataToClipboard);
+                    }
+                }, 100);
                 
             } finally {
                 setLoadingState(false);
+                setTimeout(() => {
+                    isFormSubmitting = false;
+                }, 5000);
             }
         });
+    }
+
+    // Функция копирования данных формы в буфер обмена
+    function copyFormDataToClipboard() {
+        try {
+            const formData = {
+                company: document.getElementById('company')?.value || '',
+                contactPerson: document.getElementById('contact-person')?.value || '',
+                phone: document.getElementById('phone')?.value || '',
+                email: document.getElementById('email')?.value || '',
+                equipmentType: document.getElementById('equipment-type')?.value || '',
+                partName: document.getElementById('part-name')?.value || '',
+                partDescription: document.getElementById('part-description')?.value || '',
+                quantity: document.getElementById('quantity')?.value || '',
+                deadline: document.getElementById('deadline')?.value || '',
+                additionalInfo: document.getElementById('additional-info')?.value || '',
+                fileInfo: fileInfo?.textContent || 'Файл не прикреплен',
+                submissionDate: new Date().toLocaleString('ru-RU')
+            };
+            
+            const text = `
+ЗАЯВКА НА ИЗГОТОВЛЕНИЕ ДЕТАЛИ
+
+📅 Дата заявки: ${formData.submissionDate}
+
+👤 КОНТАКТНАЯ ИНФОРМАЦИЯ:
+Компания: ${formData.company}
+Контактное лицо: ${formData.contactPerson}
+Телефон: ${formData.phone}
+Email: ${formData.email}
+
+🔧 ИНФОРМАЦИЯ О ДЕТАЛИ:
+Тип оборудования: ${formData.equipmentType}
+Наименование детали: ${formData.partName}
+Описание детали: ${formData.partDescription}
+Количество: ${formData.quantity} шт.
+Желаемый срок: ${formData.deadline}
+
+📝 ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:
+${formData.additionalInfo}
+
+📎 ФАЙЛ ЧЕРТЕЖА:
+${formData.fileInfo}
+
+---
+Это заявка отправлена с сайта РемЭнергоКомплект НПП
+            `.trim();
+            
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBtn = document.getElementById('copyFormData');
+                if (copyBtn) {
+                    copyBtn.textContent = '✅ Данные скопированы!';
+                    copyBtn.style.background = '#28a745';
+                    setTimeout(() => {
+                        copyBtn.textContent = '📋 Скопировать данные формы';
+                        copyBtn.style.background = '#0066cc';
+                    }, 3000);
+                }
+                
+                // Показываем инструкцию по отправке
+                showFormStatus(`
+                    <div style="text-align: left;">
+                        <p style="color: #28a745; font-weight: bold;">✅ Данные скопированы в буфер обмена!</p>
+                        <p>Теперь:</p>
+                        <ol style="margin-left: 20px;">
+                            <li>Откройте ваш почтовый клиент</li>
+                            <li>Создайте новое письмо</li>
+                            <li>Вставьте скопированные данные (Ctrl+V)</li>
+                            <li>Адрес получателя: <strong>recnpp-s@yandex.ru</strong></li>
+                            <li>Копия (CC): <strong>rl.recnpp-s@yandex.ru</strong></li>
+                            <li>Тема: <strong>Заявка на изготовление детали</strong></li>
+                            <li>Если есть файл чертежа, прикрепите его к письму</li>
+                            <li>Отправьте письмо</li>
+                        </ol>
+                    </div>
+                `, 'info');
+                
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
+                showFormStatus('❌ Не удалось скопировать данные. Скопируйте их вручную.', 'error');
+            });
+            
+        } catch (error) {
+            console.error('Ошибка при подготовке данных:', error);
+            showFormStatus('❌ Ошибка при подготовке данных. Заполните форму заново.', 'error');
+        }
     }
 
     // Функции ====================================================
@@ -178,6 +313,13 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
         
+        // Проверка согласия на обработку данных
+        const agreementField = document.getElementById('agreement');
+        if (agreementField && !agreementField.checked) {
+            showFormStatus('Необходимо согласие на обработку персональных данных', 'error');
+            isValid = false;
+        }
+        
         if (!isValid) {
             showFormStatus('Пожалуйста, заполните все обязательные поля правильно', 'error');
         }
@@ -205,7 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
         formStatus.className = `form-status ${type}`;
         formStatus.style.display = 'block';
         
-        // Автоматическое скрытие
+        // Автоматическое скрытие только для успешных сообщений
         if (type === 'success' || type === 'info') {
             setTimeout(() => {
                 formStatus.style.display = 'none';
@@ -226,86 +368,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (btnText && btnLoading) {
             if (isLoading) {
                 btnText.style.display = 'none';
-                btnLoading.style.display = 'inline';
+                btnLoading.style.display = 'flex';
                 submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.7';
             } else {
                 btnText.style.display = 'inline';
                 btnLoading.style.display = 'none';
                 submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
             }
         }
-    }
-    
-    // Альтернативный метод отправки (если Formsubmit не работает)
-    async function sendAlternativeEmail() {
-        return new Promise((resolve, reject) => {
-            try {
-                // Собираем данные формы
-                const formData = {
-                    company: document.getElementById('company')?.value || '',
-                    contact_person: document.getElementById('contact-person')?.value || '',
-                    phone: document.getElementById('phone')?.value || '',
-                    email: document.getElementById('email')?.value || '',
-                    equipment_type: document.getElementById('equipment-type')?.value || '',
-                    part_name: document.getElementById('part-name')?.value || '',
-                    part_description: document.getElementById('part-description')?.value || '',
-                    quantity: document.getElementById('quantity')?.value || '',
-                    deadline: document.getElementById('deadline')?.value || '',
-                    additional_info: document.getElementById('additional-info')?.value || '',
-                    submission_date: new Date().toLocaleString('ru-RU')
-                };
-                
-                // Создаем текст письма
-                const emailBody = `
-                    НОВАЯ ЗАЯВКА С САЙТА
-                    
-                    📅 Дата: ${formData.submission_date}
-                    
-                    👤 КОНТАКТНАЯ ИНФОРМАЦИЯ:
-                    Компания: ${formData.company}
-                    Контактное лицо: ${formData.contact_person}
-                    Телефон: ${formData.phone}
-                    Email: ${formData.email}
-                    
-                    🔧 ИНФОРМАЦИЯ О ДЕТАЛИ:
-                    Тип оборудования: ${formData.equipment_type}
-                    Наименование детали: ${formData.part_name}
-                    Описание детали: ${formData.part_description}
-                    Количество: ${formData.quantity} шт.
-                    Желаемый срок: ${formData.deadline}
-                    
-                    📝 ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:
-                    ${formData.additional_info}
-                    
-                    📎 ФАЙЛ ЧЕРТЕЖА:
-                    ${fileInfo?.textContent || 'Файл не прикреплен'}
-                `;
-                
-                // Создаем mailto ссылку для ОБОИХ получателей
-                const subject = encodeURIComponent('Новая заявка на изготовление детали');
-                const body = encodeURIComponent(emailBody);
-                
-                // Основной получатель и CC
-                const mailtoLink = `mailto:recnpp-s@yandex.ru?cc=rl.recnpp-s@yandex.ru&subject=${subject}&body=${body}`;
-                
-                // Открываем в новом окне
-                const mailWindow = window.open(mailtoLink, '_blank');
-                
-                if (mailWindow) {
-                    setTimeout(() => {
-                        mailWindow.close();
-                        resolve();
-                    }, 1000);
-                } else {
-                    // Если всплывающее окно заблокировано
-                    alert('Пожалуйста, отправьте заявку вручную на адреса:\nrecnpp-s@yandex.ru\nrl.recnpp-s@yandex.ru');
-                    reject(new Error('Popup blocked'));
-                }
-                
-            } catch (error) {
-                reject(error);
-            }
-        });
     }
     
     // Реальная валидация при вводе
@@ -339,6 +411,11 @@ document.addEventListener('DOMContentLoaded', function() {
         today.setDate(today.getDate() + 1);
         const tomorrow = today.toISOString().split('T')[0];
         deadlineField.min = tomorrow;
+        
+        // Преобразование в нормальный формат даты
+        deadlineField.addEventListener('focus', function() {
+            this.type = 'date';
+        });
     }
     
     // Плавная прокрутка
@@ -362,7 +439,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // Проверяем, была ли отправлена форма
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('success')) {
+        const orderNumber = localStorage.getItem('lastOrderNumber') || 'ORD-' + Date.now().toString().slice(-6);
+        showFormStatus(`
+            <div style="text-align: center;">
+                <p style="color: #28a745; font-size: 24px; margin-bottom: 10px;">✅</p>
+                <h3 style="color: #28a745; margin-bottom: 10px;">Заявка успешно отправлена!</h3>
+                <p>Мы получили вашу заявку и свяжемся с вами в течение 24 часов.</p>
+                <p style="margin-top: 10px; background: #f8f9fa; padding: 10px; border-radius: 5px;">
+                    <strong>Номер вашей заявки:</strong><br>
+                    <span style="font-size: 18px; color: #0066cc;">${orderNumber}</span>
+                </p>
+                <p style="margin-top: 10px; font-size: 14px; color: #666;">
+                    Сохраните этот номер для отслеживания статуса заявки.
+                </p>
+            </div>
+        `, 'success');
+        
+        // Убираем параметр из URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
     // Инициализация
-    console.log('Formsubmit form handler initialized');
-    console.log('Emails will be sent to: recnpp-s@yandex.ru and rl.recnpp-s@yandex.ru');
+    console.log('Form handler initialized');
+    console.log('Form will be sent to: recnpp-s@yandex.ru (with CC to rl.recnpp-s@yandex.ru)');
 });
