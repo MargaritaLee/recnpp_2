@@ -28,72 +28,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Данные альбомов для турбогенераторов
     const albumsData = {
-        'in-stock': {
-            title: 'В наличии - Турбогенераторы',
-            photos: Array.from({length: 22}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e8f4f8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%23d35400'%3EТурбогенератор%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%23d35400'%3EДеталь ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%23d35400'%3E(В наличии)%3C/text%3E%3C/svg%3E`,
-                caption: `Турбогенераторная деталь ${i + 1} - в наличии`
+        'bolts': {
+            title: 'Болты и винты',
+            photos: Array.from({length: 20}, (_, i) => ({
+                src: `/gallery/turbo/bolts_${i + 1}.jpg`,
+                caption: ''
             }))
         },
         'exclusive': {
-            title: 'Эксклюзив - Турбогенераторы',
+            title: 'Эксклюзив',
             photos: Array.from({length: 20}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f8e8e8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%23c0392b'%3EЭксклюзив%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%23c0392b'%3EДеталь ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%23c0392b'%3E(Уникальная)%3C/text%3E%3C/svg%3E`,
-                caption: `Эксклюзивная турбодеталь ${i + 1} - уникальное исполнение`
+                src: `/gallery/turbo/exclusive_${i + 1}.jpg`,
+                caption: ''
             }))
         },
-        'bolts': {
-            title: 'Болты - Турбогенераторы',
-            photos: Array.from({length: 21}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e8f8e8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%2327ae60'%3EБолт%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%2327ae60'%3EТип ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%2327ae60'%3E(Турбогенератор)%3C/text%3E%3C/svg%3E`,
-                caption: `Болт для турбогенератора тип ${i + 1} - высокопрочный`
+        'oil-catcher': {
+            title: 'Маслоуловитель',
+            photos: Array.from({length: 20}, (_, i) => ({
+                src: `/gallery/turbo/oil-catcher_${i + 1}.jpg`,
+                caption: ''
             }))
         },
         'contact-ring': {
-    title: 'Контактное кольцо - Турбогенераторы',
-    photos: [
-        {
-            src: "cr_1.jpg",
-            caption: "Контактное кольцо турбогенератора 1 - прецизионное изготовление"
-        },
-        {
-            src: "cr_2.jpg", 
-            caption: "Контактное кольцо турбогенератора 2 - вид сбоку"
-        },
-        {
-            src: "cr_3.jpg",
-            caption: "Контактное кольцо турбогенератора 3 - крупный план"
-        },
-        {
-            src: "cr_4.jpg",
-            caption: "Контактное кольцо турбогенератора 4 - процесс обработки"
-        },
-        // ... добавьте остальные 14 фото по аналогии
-        {
-            src: "cr_18.jpg",
-            caption: "Контактное кольцо турбогенератора 18 - готовое изделие"
-        }
-    ]
-},
-        'oil-catcher': {
-            title: 'Маслоуловитель - Турбогенераторы',
-            photos: Array.from({length: 19}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23e8e8f8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%238e44ad'%3EМаслоуловитель%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%238e44ad'%3EСистема ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%238e44ad'%3E(Турбо)%3C/text%3E%3C/svg%3E`,
-                caption: `Маслоуловитель турбосистемы ${i + 1} - эффективный`
+            title: 'Контактное кольцо',
+            photos: Array.from({length: 20}, (_, i) => ({
+                src: `/gallery/turbo/contact-ring_${i + 1}.jpg`,
+                caption: ''
             }))
         },
         'underband-segments': {
-            title: 'Сегменты подбандажные - Турбогенераторы',
-            photos: Array.from({length: 23}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f8e8f4'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='16' text-anchor='middle' fill='%23e84393'%3EПодбандажный%3C/text%3E%3Ctext x='200' y='165' font-family='Arial' font-size='16' text-anchor='middle' fill='%23e84393'%3EСегмент ${i + 1}%3C/text%3E%3Ctext x='200' y='190' font-family='Arial' font-size='14' text-anchor='middle' fill='%23e84393'%3E(Турбогенератор)%3C/text%3E%3C/svg%3E`,
-                caption: `Подбандажный сегмент турбогенератора ${i + 1} - точная подгонка`
+            title: 'Подбандажные сегменты',
+            photos: Array.from({length: 20}, (_, i) => ({
+                src: `/gallery/turbo/underband-segments_${i + 1}.jpg`,
+                caption: ''
             }))
         },
         'agp-40': {
-            title: 'АГП-40 - Турбогенераторы',
+            title: 'АГП-40',
             photos: Array.from({length: 20}, (_, i) => ({
-                src: `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%23f4e8f8'/%3E%3Ctext x='200' y='140' font-family='Arial' font-size='18' text-anchor='middle' fill='%239b59b6'%3EАГП-40%3C/text%3E%3Ctext x='200' y='170' font-family='Arial' font-size='16' text-anchor='middle' fill='%239b59b6'%3EКомпонент ${i + 1}%3C/text%3E%3Ctext x='200' y='200' font-family='Arial' font-size='14' text-anchor='middle' fill='%239b59b6'%3E(Турбо)%3C/text%3E%3C/svg%3E`,
-                caption: `АГП-40 компонент ${i + 1} для турбогенератора`
+                src: `/gallery/turbo/agp-40_${i + 1}.jpg`,
+                caption: ''
             }))
         }
     };
@@ -107,6 +81,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Album button click handlers
     const albumButtons = document.querySelectorAll('.album-btn');
     albumButtons.forEach(button => {
+        // Обновляем текст кнопок в соответствии с названиями альбомов
+        const albumId = button.getAttribute('data-album');
+        if (albumsData[albumId]) {
+            button.textContent = albumsData[albumId].title;
+        }
+        
         button.addEventListener('click', function() {
             const albumId = this.getAttribute('data-album');
             openAlbum(albumId);
@@ -129,8 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
             photoItem.innerHTML = `
-                <img src="${photo.src}" alt="${photo.caption}" loading="lazy">
-                <div class="photo-caption">${photo.caption}</div>
+                <img src="${photo.src}" alt="Фото ${index + 1}" loading="lazy">
+                ${photo.caption ? `<div class="photo-caption">${photo.caption}</div>` : ''}
             `;
             albumPhotos.appendChild(photoItem);
         });
@@ -216,9 +196,10 @@ document.addEventListener('DOMContentLoaded', function() {
         pagePhotos.forEach((photo, index) => {
             const photoItem = document.createElement('div');
             photoItem.className = 'photo-item';
+            const photoIndex = startIndex + index + 1;
             photoItem.innerHTML = `
-                <img src="${photo.src}" alt="${photo.caption}" loading="lazy">
-                <div class="photo-caption">${photo.caption}</div>
+                <img src="${photo.src}" alt="Фото ${photoIndex}" loading="lazy">
+                ${photo.caption ? `<div class="photo-caption">${photo.caption}</div>` : ''}
             `;
             albumPhotos.appendChild(photoItem);
         });
@@ -249,6 +230,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 });
-
-
-
